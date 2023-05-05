@@ -1,13 +1,17 @@
-@file:Suppress("UNUSED_PARAMETER") // <- REMOVE
+// @file:Suppress("UNUSED_PARAMETER") // <- REMOVE
 package galaxyraiders.core.physics
 
 data class Point2D(val x: Double, val y: Double) {
   operator fun plus(p: Point2D): Point2D {
-    return INVALID_POINT
+    val NewX: Double = x + p.x
+    val NewY: Double = y + p.y
+    return Point2D(NewX, NewY)
   }
 
   operator fun plus(v: Vector2D): Point2D {
-    return INVALID_POINT
+    val NewX: Double = x + v.dx
+    val NewY: Double = y + v.dy
+    return Point2D(NewX, NewY)
   }
 
   override fun toString(): String {
@@ -15,26 +19,34 @@ data class Point2D(val x: Double, val y: Double) {
   }
 
   fun toVector(): Vector2D {
-    return INVALID_VECTOR
+    return Vector2D(x, y)
   }
 
   fun impactVector(p: Point2D): Vector2D {
-    return INVALID_VECTOR
+    val dx: Double = Math.abs(x - p.x)
+    val dy: Double = Math.abs(y - p.y)
+    return Vector2D(dx, dy)
   }
 
   fun impactDirection(p: Point2D): Vector2D {
-    return INVALID_VECTOR
+    val dx: Double = Math.abs(x - p.x)
+    val dy: Double = Math.abs(y - p.y)
+    return Vector2D(dx, dy)
   }
 
   fun contactVector(p: Point2D): Vector2D {
-    return INVALID_VECTOR
+    val impactVersor: Vector2D = impactVector(p)
+    return impactVersor.normal
   }
 
   fun contactDirection(p: Point2D): Vector2D {
-    return INVALID_VECTOR
+    val impactVersor: Vector2D = impactVector(p)
+    return impactVersor.normal
   }
 
   fun distance(p: Point2D): Double {
-    return INVALID_DOUBLE
+    val DeltaX: Double = Math.abs(x - p.x)
+    val DeltaY: Double = Math.abs(y - p.y)
+    return Math.sqrt(DeltaX * DeltaX + DeltaY * DeltaY)
   }
 }
