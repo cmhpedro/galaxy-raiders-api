@@ -3,15 +3,15 @@ package galaxyraiders.core.physics
 
 data class Point2D(val x: Double, val y: Double) {
   operator fun plus(p: Point2D): Point2D {
-    val NewX: Double = x + p.x
-    val NewY: Double = y + p.y
-    return Point2D(NewX, NewY)
+    val newX: Double = x + p.x
+    val newY: Double = y + p.y
+    return Point2D(newX, newY)
   }
 
   operator fun plus(v: Vector2D): Point2D {
-    val NewX: Double = x + v.dx
-    val NewY: Double = y + v.dy
-    return Point2D(NewX, NewY)
+    val newX: Double = x + v.dx
+    val newY: Double = y + v.dy
+    return Point2D(newX, newY)
   }
 
   override fun toString(): String {
@@ -45,8 +45,8 @@ data class Point2D(val x: Double, val y: Double) {
   }
 
   fun distance(p: Point2D): Double {
-    val DeltaX: Double = Math.abs(x - p.x)
-    val DeltaY: Double = Math.abs(y - p.y)
-    return Math.sqrt(DeltaX * DeltaX + DeltaY * DeltaY)
+    val deltaX: Double = Math.abs(x - p.x)
+    val deltaY: Double = Math.abs(y - p.y)
+    return Math.sqrt(deltaX * deltaX + deltaY * deltaY)
   }
 }

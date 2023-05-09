@@ -22,18 +22,18 @@ data class Vector2D(val dx: Double, val dy: Double) {
     get() = div(magnitude)
 
   val normal: Vector2D
-    get() = Vector2D(dy/magnitude, -dx/magnitude)
+    get() = Vector2D(dy / magnitude, -dx / magnitude)
 
   operator fun times(scalar: Double): Vector2D {
-    val NewDx: Double = dx * scalar
-    val NewDy: Double = dy * scalar
-    return Vector2D(NewDx, NewDy)
+    val newDx: Double = dx * scalar
+    val newDy: Double = dy * scalar
+    return Vector2D(newDx, newDy)
   }
 
   operator fun div(scalar: Double): Vector2D {
-    val NewDx: Double = dx / scalar
-    val NewDy: Double = dy / scalar
-    return Vector2D(NewDx, NewDy)
+    val newDx: Double = dx / scalar
+    val newDy: Double = dy / scalar
+    return Vector2D(newDx, newDy)
   }
 
   operator fun times(v: Vector2D): Double {
@@ -43,9 +43,9 @@ data class Vector2D(val dx: Double, val dy: Double) {
   }
 
   operator fun plus(v: Vector2D): Vector2D {
-    val NewDx: Double = dx + v.dx
-    val NewDy: Double = dy + v.dy
-    return Vector2D(NewDx, NewDy)
+    val newDx: Double = dx + v.dx
+    val newDy: Double = dy + v.dy
+    return Vector2D(newDx, newDy)
   }
 
   operator fun plus(p: Point2D): Point2D {
@@ -55,15 +55,15 @@ data class Vector2D(val dx: Double, val dy: Double) {
   }
 
   operator fun unaryMinus(): Vector2D {
-    val NewDx: Double = -dx
-    val NewDy: Double = -dy
-    return Vector2D(NewDx, NewDy)
+    val newDx: Double = -dx
+    val newDy: Double = -dy
+    return Vector2D(newDx, newDy)
   }
 
   operator fun minus(v: Vector2D): Vector2D {
-    val NewDx: Double = dx - v.dx
-    val NewDy: Double = dy - v.dy
-    return Vector2D(NewDx, NewDy)
+    val newDx: Double = dx - v.dx
+    val newDy: Double = dy - v.dy
+    return Vector2D(newDx, newDy)
   }
 
   fun scalarProject(target: Vector2D): Double {
@@ -72,13 +72,13 @@ data class Vector2D(val dx: Double, val dy: Double) {
   }
 
   fun vectorProject(target: Vector2D): Vector2D {
-    val scalar: Double = this * target / (target.magnitude * target.magnitude)
-    return scalar * target
+    val versorProduct: Double = this * target
+    return versorProduct * target / (target.magnitude * target.magnitude)
   }
 }
 
 operator fun Double.times(v: Vector2D): Vector2D {
-  val NewDx: Double = this * v.dx
-  val NewDy: Double = this * v.dy
-  return Vector2D(NewDx, NewDy)
+  val newDx: Double = this * v.dx
+  val newDy: Double = this * v.dy
+  return Vector2D(newDx, newDy)
 }
