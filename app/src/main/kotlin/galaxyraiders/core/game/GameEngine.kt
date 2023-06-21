@@ -6,6 +6,12 @@ import galaxyraiders.ports.ui.Controller
 import galaxyraiders.ports.ui.Controller.PlayerCommand
 import galaxyraiders.ports.ui.Visualizer
 import kotlin.system.measureTimeMillis
+import java.time.Instant
+import java.io.File
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
+
 
 const val MILLISECONDS_PER_SECOND: Int = 1000
 
@@ -32,8 +38,15 @@ class GameEngine(
     height = GameEngineConfig.spaceFieldHeight,
     generator = generator
   )
+  val initTimestamp: Instant
 
   var playing = true
+  var score: Double = 0.0
+  var asteroidsDestroyed: Int = 0
+
+  init {
+    initTimestamp = Instant.now()
+  }
 
   fun execute() {
     while (true) {
@@ -91,6 +104,9 @@ class GameEngine(
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
         if (first is Missile && second is Asteroid) {
           this.field.generateExplosion(second)
+          this.score += 100/second.radius
+          this.asteroidsDestroyed++
+          this.saveScore()
         }
       }
     }
@@ -119,6 +135,27 @@ class GameEngine(
   fun renderSpaceField() {
     this.visualizer.renderSpaceField(this.field)
   }
+
+  fun saveScore() {
+    val timestamp = this.initTimestamp.toString()
+    val informations = """{ "score": ${this.score}, "asteroids destroyed": ${this.asteroidsDestroyed} }"""
+
+    val mapper = ObjectMapper()
+    val informationsJson = mapper.readTree(informations)
+
+    val scoreboardFile = File("src/main/kotlin/galaxyraiders/core/score/Scoreboard.json")
+    val leaderboardFile = File("src/main/kotlin/galaxyraiders/core/score/Leaderboard.json")
+
+    val scoreboardJson = convertFileToJson(scoreboardFile)
+    val leaderboardJson = convertFileToJson(leaderboardFile)
+
+    (scoreboardJson as? ObjectNode)?.set<JsonNode>(timestamp, informationsJson)
+    (leaderboardJson as? ObjectNode)?.set<JsonNode>(timestamp, informationsJson)
+    keepTop3(leaderboardJson)
+
+    scoreboardFile.writeText(scoreboardJson.toPrettyString())
+    leaderboardFile.writeText(leaderboardJson.toPrettyString())
+  }
 }
 
 fun <T> List<T>.forEachPair(action: (Pair<T, T>) -> Unit) {
@@ -126,5 +163,29 @@ fun <T> List<T>.forEachPair(action: (Pair<T, T>) -> Unit) {
     for (j in i + 1 until this.size) {
       action(Pair(this[i], this[j]))
     }
+  }
+}
+
+fun convertFileToJson(file: File): JsonNode {
+  if (!file.exists()) {
+    file.createNewFile()
+  }
+
+  if (file.readText().isEmpty()) {
+    file.writeText("{}")
+  }
+
+  val mapper = ObjectMapper()
+  val json = mapper.readTree(file.readText())
+  return json
+}
+
+fun keepTop3(json: JsonNode) {
+  val sorted = json.fields().asSequence().sortedByDescending { it.value.get("score").asDouble() }.toList()
+  val top3 = sorted.take(3)
+
+  (json as? ObjectNode)?.removeAll()
+  top3.forEach { (timestamp, informations) ->
+    (json as? ObjectNode)?.set<JsonNode>(timestamp, informations)
   }
 }
