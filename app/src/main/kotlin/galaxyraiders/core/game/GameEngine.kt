@@ -1,19 +1,19 @@
 package galaxyraiders.core.game
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.ObjectNode
 import galaxyraiders.Config
 import galaxyraiders.ports.RandomGenerator
 import galaxyraiders.ports.ui.Controller
 import galaxyraiders.ports.ui.Controller.PlayerCommand
 import galaxyraiders.ports.ui.Visualizer
-import kotlin.system.measureTimeMillis
-import java.time.Instant
 import java.io.File
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
-
+import java.time.Instant
+import kotlin.system.measureTimeMillis
 
 const val MILLISECONDS_PER_SECOND: Int = 1000
+const val BASE_SCORE: Double = 100.0
 
 object GameEngineConfig {
   private val config = Config(prefix = "GR__CORE__GAME__GAME_ENGINE__")
@@ -104,7 +104,7 @@ class GameEngine(
         first.collideWith(second, GameEngineConfig.coefficientRestitution)
         if (first is Missile && second is Asteroid) {
           this.field.generateExplosion(second)
-          this.score += 100/second.radius
+          this.score += BASE_SCORE / second.radius
           this.asteroidsDestroyed++
           this.saveScore()
         }
@@ -151,7 +151,7 @@ class GameEngine(
 
     (scoreboardJson as? ObjectNode)?.set<JsonNode>(timestamp, informationsJson)
     (leaderboardJson as? ObjectNode)?.set<JsonNode>(timestamp, informationsJson)
-    keepTop3(leaderboardJson)
+    keepTopN(leaderboardJson)
 
     scoreboardFile.writeText(scoreboardJson.toPrettyString())
     leaderboardFile.writeText(leaderboardJson.toPrettyString())
@@ -180,12 +180,12 @@ fun convertFileToJson(file: File): JsonNode {
   return json
 }
 
-fun keepTop3(json: JsonNode) {
+fun keepTopN(json: JsonNode, topN: Int = 3) {
   val sorted = json.fields().asSequence().sortedByDescending { it.value.get("score").asDouble() }.toList()
-  val top3 = sorted.take(3)
+  val topN = sorted.take(topN)
 
   (json as? ObjectNode)?.removeAll()
-  top3.forEach { (timestamp, informations) ->
+  topN.forEach { (timestamp, informations) ->
     (json as? ObjectNode)?.set<JsonNode>(timestamp, informations)
   }
 }
